@@ -12,6 +12,5 @@ if User.count.zero?
   User.create!(
     email: 'thanglearndevops@gmail.com',
     password: 'thang123'
-    # password: BCrypt::Password.create('thang123')
   )
 end

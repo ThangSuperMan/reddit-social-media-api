@@ -1,6 +1,6 @@
 module Api
   module V1
-    class UsersController < BaseController
+    class UsersController < Common::BaseController
       before_action :doorkeeper_authorize!, except: %i[create]
 
       def create
