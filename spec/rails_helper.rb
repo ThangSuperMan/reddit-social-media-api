@@ -31,6 +31,7 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
+  config.include Devise::Test::IntegrationHelpers, type: :request
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_paths = [
@@ -66,9 +67,18 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 end
 
+Rails.application.load_seed
+
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec
     with.library :rails
   end
 end
+
+# Rspec::Machers.define :match_json do |expected|
+#   match do |actual|
+#     actual_json = JSON.parse(actual, symbolize_names: true)
+#     expect(actual_json)
+#   end
+# end

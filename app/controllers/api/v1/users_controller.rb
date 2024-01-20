@@ -26,7 +26,7 @@ module Api
               refresh_token: access_token.refresh_token,
               created_at: access_token.created_at.to_time.to_i
             }
-          }
+          }, status: :created
         else
           render json: { error: user.errors.full_messages }, status: :unprocessable_entity
         end
@@ -41,8 +41,8 @@ module Api
       def generate_refresh_token
         loop do
           token = SecureRandom.hex(32)
-          is_token_exists_in_database = Doorkeeper::AccessToken.exists?(refresh_token: token)
-          break token unless is_token_exists_in_database
+          is_token_exists_in_the_database = Doorkeeper::AccessToken.exists?(refresh_token: token)
+          break token unless is_token_exists_in_the_database
         end
       end
     end
