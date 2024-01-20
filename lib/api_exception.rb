@@ -9,7 +9,6 @@ module ApiException
 
     # 404
     'ActiveRecord::RecordNotFound' => { status: 404, message: 'Cannot find record' },
-    # 'NotFound' => { status: 404, message: 'Your own message in here' }
   }.freeze
 
   class BaseError < StandardError
@@ -27,8 +26,6 @@ module ApiException
           unless ApiException.const_defined?(exception_name)
             ApiException.const_set(exception_name, Class.new(ApiException::BaseError))
             exception_name = "ApiException::#{exception_name}"
-            puts 'after format'
-            puts "ApiException::#{exception_name}"
           end
 
           rescue_from exception_name do |exception|
