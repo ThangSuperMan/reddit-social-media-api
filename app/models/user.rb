@@ -6,6 +6,16 @@ class User < ApplicationRecord
 
   validates :email, format: URI::MailTo::EMAIL_REGEXP
 
+  enum role: {
+    member: 0,
+    user: 1
+  }
+
+  before_create :set_initial_role
+  def set_initial_role
+    self.role = 'user'
+  end
+
   def self.authenticate(email, password)
     user = User.find_for_authentication(email: email)
     user&.valid_password?(password) ? user : nil
