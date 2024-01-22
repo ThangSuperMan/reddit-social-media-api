@@ -6,31 +6,42 @@ RSpec.describe 'Sessions', type: :request do
 
     context 'valid credentials' do
       it 'returns a successful response' do
-        user
-        post oauth_token_path, params: {
-          grant_type: 'password',
-          email: user.email,
-          password: user.password,
-          client_id: ENV['MOBILE_CLIENT_ID'],
-          client_secret: ENV['MOBILE_CLIENT_SECRET']
-        }
+        oauth_sign_in(user)
 
+        access_token = latest_access_token
         json_body = JSON.parse(response.body)
-        access_token = Doorkeeper::AccessToken.last
-        expected_response_data = {
-          'access_token' => access_token.token,
-          'token_type' => 'Bearer',
-          'expires_in' => access_token.expires_in,
-          'refresh_token' => access_token.refresh_token,
-          'created_at' => access_token.created_at.to_time.to_i
-        }
 
         expect(response).to have_http_status(:success)
-        expect(json_body).to include(expected_response_data)
+        expect(json_body).to include(response_format(access_token))
+      end
+
+      it 'returns a access_token based on refresh_token' do
+        oauth_sign_in(user)
+
+        access_token = Doorkeeper::AccessToken.last
+        oauth_request_new_access_token(access_token.refresh_token)
+        access_token = latest_access_token
+        json_body = JSON.parse(response.body)
+
+        expect(response).to have_http_status(:success)
+        expect(json_body).to include(response_format(access_token))
       end
     end
 
-    context 'invalid credentials' do
+    private
+
+    def latest_access_token
+      Doorkeeper::AccessToken.last
+    end
+
+    def response_format(access_token)
+      {
+        'access_token' => access_token.token,
+        'token_type' => 'Bearer',
+        'expires_in' => access_token.expires_in,
+        'refresh_token' => access_token.refresh_token,
+        'created_at' => access_token.created_at.to_time.to_i
+      }
     end
   end
 end

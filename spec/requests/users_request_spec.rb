@@ -5,7 +5,7 @@ RSpec.describe 'Users', type: :request do
     context 'with invalid user params' do
       it 'returns error status after creating a new user' do
         post api_v1_users_path, params: {
-          email: 'thanghandsome@.gmail.com',
+          email: 'user@.gmail.com',
           password: 'password123',
           client_id: ENV['MOBILE_CLIENT_ID']
         }
@@ -17,7 +17,7 @@ RSpec.describe 'Users', type: :request do
     context 'with valid user params' do
       it 'returns the user data' do
         post api_v1_users_path, params: {
-          email: 'thanghandsome@gmail.com',
+          email: 'user@gmail.com',
           password: 'password123',
           client_id: ENV['MOBILE_CLIENT_ID']
         }

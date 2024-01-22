@@ -1,6 +1,6 @@
 if Doorkeeper::Application.count.zero?
   Doorkeeper::Application.create!(
-    name: 'IOS client',
+    name: 'Mobile client',
     uid: ENV['MOBILE_CLIENT_ID'],
     secret: ENV['MOBILE_CLIENT_SECRET'],
     redirect_uri: '',
@@ -10,7 +10,7 @@ end
 
 if User.count.zero? && Rails.env.development?
   User.create!(
-    email: 'thanglearndevops@gmail.com',
+    email: 'thanghandsome@gmail.com',
     password: 'thang123'
   )
 end
