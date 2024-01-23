@@ -4,11 +4,7 @@ RSpec.describe 'Users', type: :request do
   describe 'POST create' do
     context 'with invalid user params' do
       it 'returns error status after creating a new user' do
-        post api_v1_users_path, params: {
-          email: 'user@.gmail.com',
-          password: 'password123',
-          client_id: ENV['MOBILE_CLIENT_ID']
-        }
+        user_sign_up(email: 'user@.gmail.com', password: 'password123')
 
         expect(response).to have_http_status(422)
       end
@@ -16,12 +12,9 @@ RSpec.describe 'Users', type: :request do
 
     context 'with valid user params' do
       it 'returns the user data' do
-        post api_v1_users_path, params: {
-          email: 'user@gmail.com',
-          password: 'password123',
-          client_id: ENV['MOBILE_CLIENT_ID']
-        }
-        user = User.last
+        user_sign_up(email: 'normal_user@gmail.com', password: 'password123')
+
+        user = latest_user
         access_token = Doorkeeper::AccessToken.last
         json_body = JSON.parse(response.body)
         expected_user_data = {
@@ -36,6 +29,12 @@ RSpec.describe 'Users', type: :request do
 
         expect(response).to have_http_status(:created)
         expect(json_body['user']).to include(expected_user_data)
+      end
+
+      private
+
+      def latest_user
+        User.last
       end
     end
   end

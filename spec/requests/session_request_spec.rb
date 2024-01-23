@@ -1,34 +1,39 @@
 require 'rails_helper'
 
 RSpec.describe 'Sessions', type: :request do
+  let(:user) { create(:user) }
+
   describe 'POST /oauth/token' do
-    let(:user) { create(:user) }
+    before do
+      oauth_sign_in(user)
+    end
 
     context 'valid credentials' do
       it 'returns a successful response' do
-        oauth_sign_in(user)
-
-        access_token = latest_access_token
-        json_body = JSON.parse(response.body)
-
         expect(response).to have_http_status(:success)
-        expect(json_body).to include(response_format(access_token))
+        expect(json_body).to include(response_format(latest_access_token))
       end
 
-      it 'returns a access_token based on refresh_token' do
-        oauth_sign_in(user)
-
-        access_token = Doorkeeper::AccessToken.last
-        oauth_request_new_access_token(access_token.refresh_token)
-        access_token = latest_access_token
-        json_body = JSON.parse(response.body)
+      it 'returns a new access_token based on refresh_token' do
+        oauth_request_new_access_token(latest_access_token.refresh_token)
 
         expect(response).to have_http_status(:success)
-        expect(json_body).to include(response_format(access_token))
+        expect(json_body).to include(response_format(latest_access_token))
+      end
+
+      it 'makes access_token expire' do
+        oauth_logout(latest_access_token.token)
+
+        expect(response).to have_http_status(:success)
+        expect(latest_access_token.revoked_at).to_not be_nil
       end
     end
 
     private
+
+    def json_body
+      JSON.parse(response.body)
+    end
 
     def latest_access_token
       Doorkeeper::AccessToken.last

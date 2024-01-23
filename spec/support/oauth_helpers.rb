@@ -17,4 +17,12 @@ module OauthHelpers
       client_secret: ENV['MOBILE_CLIENT_SECRET']
     }
   end
+
+  def oauth_logout(access_token)
+    post oauth_revoke_path, params: {
+      token: access_token,
+      client_id: ENV['MOBILE_CLIENT_ID'],
+      client_secret: ENV['MOBILE_CLIENT_SECRET']
+    }
+  end
 end
