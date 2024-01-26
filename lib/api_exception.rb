@@ -37,6 +37,17 @@ module ApiException
           end
         end
       end
+
+      private
+
+      def doorkeeper_unauthorized_render_options(error: nil)
+        {
+          json: {
+            message: 'Unauthorized',
+            detail: error.try(:description) || 'Access token is invalid or has expired'
+          }
+        }
+      end
     end
   end
 end

@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 ruby '3.2.2'
 
+gem 'aws-sdk', '~> 3'
 gem 'cancancan', '~> 3.5'
 gem 'dotenv-rails', '~> 2.1', '>= 2.1.1'
 gem 'pg', '~> 1.1'

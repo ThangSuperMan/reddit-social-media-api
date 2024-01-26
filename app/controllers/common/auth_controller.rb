@@ -4,8 +4,8 @@ module Common
 
     private
 
-    def current_use
-      @current_user ||= User.find_id(id: doorkeeper_token[:resource_owner_id])
+    def current_user
+      @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
     end
   end
 end

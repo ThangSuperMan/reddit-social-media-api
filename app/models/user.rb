@@ -11,6 +11,8 @@ class User < ApplicationRecord
     user: 1
   }
 
+  has_many :posts
+
   before_create :set_initial_role
   def set_initial_role
     self.role = 'user'

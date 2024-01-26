@@ -1,7 +1,7 @@
 module Api
   module V1
     class UsersController < Common::BaseController
-      before_action :doorkeeper_authorize!, except: %i[create]
+      before_action :doorkeeper_authorize!, except: [:create]
 
       def create
         user = User.new(email: user_params[:email], password: user_params[:password])
