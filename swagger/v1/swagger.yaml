@@ -1,0 +1,271 @@
+openapi: 3.0.3
+info:
+  title: Honey morning API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/v1/users:
+    post:
+      summary: Register (create a new user) 
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewUser"
+      responses:
+        "200":
+          description: Access token and refresh token obtained successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+                  refresh_token:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        "422":
+          description: Email has already been taken
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreated"
+              example:
+                message: [
+                  "Email has already been taken"     
+                ] 
+
+  /oauth/token:
+    post:
+      summary: Login (gain credentials)
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                  example: "password"
+                email:
+                  type: string
+                  example: "thanglearndevops@gmail.com"
+                password:
+                  type: string
+                  example: "thang123"
+                client_id:
+                  type: string
+                  example: "x6CJ4b5BqZddmKIgyUWWL1omIB6f8SNOPI1HGYkIV_o"
+                client_secret:
+                  type: string
+                  example: "XD_ehOAZPc6fJAy4mkovw75BTsw4E3IXN2F5Z6EfzsA"
+      responses:
+        "200":
+          description: Access token and refresh token obtained successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+                  refresh_token:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        "400 (wrong password)":
+          description: Wrong user's password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "invalid_grant"
+                error_description: "The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client."
+        "400 (bad request)":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "unsupported_grant_type"
+                error_description: "The authorization grant type is not supported by the authorization server."
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: "invalid_client"
+                error_description: "Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method."
+
+  /api/v1/posts:
+    get:
+      summary: Get a list of posts
+      operationId: getPosts
+      responses:
+        "200":
+          description: A list of posts
+          content:
+            application/json:
+              schema:
+                type: array
+              example:
+                message: "Fetch all posts successfully"
+                metadata:
+                  - post:
+                      id: 1
+                      user_id: 2
+                      title: "Today, it is very good outside 🏖️"
+                      body: "Let's chill with our children"
+                      created_at: "2024-01-27T14:30:40.808Z"
+                      updated_at: "2024-01-27T14:30:40.808Z"
+                    images:
+                      - media_url: "http://honey-morning-bucket-storage.s3.ap-southeast-1.amazonaws.com/333481aa0824c4ef.jpg"
+                        media_type: "image"
+                  - post:
+                      id: 2
+                      user_id: 2
+                      title: "Morning routine"
+                      body: "Improve your mental and physical health"
+                      created_at: "2024-01-27T14:32:24.388Z"
+                      updated_at: "2024-01-27T14:32:24.388Z"
+                    images:
+                      - media_url: "http://honey-morning-bucket-storage.s3.ap-southeast-1.amazonaws.com/e2baef2c1366970f.jpg"
+                        media_type: "image"
+
+    post:
+      summary: Create a new post
+      operationId: createPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewPost"
+      responses:
+        "201":
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  metadata:
+                    type: object
+                    properties:
+                      post:
+                        $ref: "#/components/schemas/Post"
+                      images:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Image"
+              example:
+                message: "Created post successfully"
+                metadata:
+                  post:
+                    id: 3
+                    user_id: 2
+                    title: "Post title"
+                    body: "Post body"
+                    created_at: "2024-01-27T14:36:11.800Z"
+                    updated_at: "2024-01-27T14:36:11.800Z"
+                  images:
+                    - media_url: "http://honey-morning-bucket-storage.s3.ap-southeast-1.amazonaws.com/d87fdaf7175461ff.jpeg"
+                      media_type: "image"
+components:
+  schemas:
+    NewUser:
+      type: object
+      properties:
+        client_id:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    UserCreated:
+      type: object
+      properties:
+        message:
+          type: string
+        metadata:
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+            access_token:
+              type: string
+            token_type:
+              type: string
+            expires_in:
+              type: integer
+            refresh_token:
+              type: string
+            created_at:
+              type: integer
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Image:
+      type: object
+      properties:
+        media_url:
+          type: string
+        media_url:
+          type: string
+    NewPost:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+        media:
+          type: file

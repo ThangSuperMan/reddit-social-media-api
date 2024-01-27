@@ -8,6 +8,9 @@ gem 'dotenv-rails', '~> 2.1', '>= 2.1.1'
 gem 'pg', '~> 1.1'
 gem 'puma', '>= 5.0'
 gem 'rails', '~> 7.1.2'
+gem 'rswag', '~> 2.4'
+gem 'rswag-api'
+gem 'rswag-ui'
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem 'jbuilder'
@@ -39,6 +42,8 @@ group :development, :test do
   gem 'faker', '~> 3.2', '>= 3.2.3'
   gem 'pry-rails', '~> 0.3.9'
   gem 'rspec-rails', '~> 6.0', '>= 6.0.3'
+  gem 'rubocop', '~> 1.60', require: false
+  gem 'rubocop-rails', '~> 2.23', '>= 2.23.1'
 end
 
 group :development do
