@@ -6,7 +6,12 @@ module Api
       include S3
 
       def index
-        posts = Post.all
+        posts = Post.all.includes(:post_images).map do |post|
+          {
+            post: post,
+            images: post_images(post.post_images)
+          }
+        end
 
         json_response(
           message: 'Fetch all posts successfully',
@@ -17,21 +22,29 @@ module Api
 
       def create
         current_user.posts.create(post_params)
+
         post = Post.last
         PostImage.create(
           media_url: "http://#{ENV['AWS_S3_BUCKET']}.s3.#{ENV['AWS_REGION']}.amazonaws.com/#{upload_media}",
           media_type: 'image',
-          post: 
+          post: post
         )
 
         json_response(
           message: 'Created post successfully',
-          metadata: post,
+          metadata: {
+            post: post,
+            images: post_images(post.post_images)
+          },
           status: :created
         )
       end
 
       private
+
+      def post_images(images)
+        images.map { |image| { media_url: image.media_url, media_type: image.media_type } }
+      end
 
       def upload_media
         media_file = params[:post][:media]
