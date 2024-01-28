@@ -9,8 +9,8 @@ gem 'pg', '~> 1.1'
 gem 'puma', '>= 5.0'
 gem 'rails', '~> 7.1.2'
 gem 'rswag', '~> 2.4'
-gem 'rswag-api'
-gem 'rswag-ui'
+gem 'rswag-api', '~> 2.13'
+gem 'rswag-ui', '~> 2.5', '>= 2.5.1'
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem 'jbuilder'

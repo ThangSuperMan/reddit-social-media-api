@@ -1830,8 +1830,8 @@ DEPENDENCIES
   rails (~> 7.1.2)
   rspec-rails (~> 6.0, >= 6.0.3)
   rswag (~> 2.4)
-  rswag-api
-  rswag-ui
+  rswag-api (~> 2.13)
+  rswag-ui (~> 2.5, >= 2.5.1)
   rubocop (~> 1.60)
   rubocop-rails (~> 2.23, >= 2.23.1)
   shoulda-matchers (~> 6.0)

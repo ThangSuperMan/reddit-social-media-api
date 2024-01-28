@@ -1,5 +1,3 @@
-require 'pathname'
-
 module S3
   def s3_upload(file)
     s3_bucket = Aws::S3::Resource.new.bucket(ENV['AWS_S3_BUCKET'])

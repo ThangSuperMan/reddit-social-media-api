@@ -1,7 +1,7 @@
 module Api
   module V1
     class PostsController < Common::BaseController
-      before_action :doorkeeper_authorize!, except: [:index]
+      before_action :doorkeeper_authorize!, except: [:index, :show]
 
       include S3
 
@@ -16,6 +16,19 @@ module Api
         json_response(
           message: 'Fetch all posts successfully',
           metadata: posts,
+          status: :ok
+        )
+      end
+
+      def show
+        post = Post.find(params[:id])
+
+        json_response(
+          message: 'Fetch a post successfully',
+          metadata: {
+            post: post,
+            images: post_images(post.post_images)
+          },
           status: :ok
         )
       end

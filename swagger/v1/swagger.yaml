@@ -7,8 +7,9 @@ servers:
 paths:
   /api/v1/users:
     post:
-      summary: Register (create a new user) 
-      operationId: createUser
+      summary: User sign-up
+      tags:
+        - Authentication
       requestBody:
         required: true
         content:
@@ -21,19 +22,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  access_token:
-                    type: string
-                  token_type:
-                    type: string
-                  expires_in:
-                    type: integer
-                  refresh_token:
-                    type: string
-                  created_at:
-                    type: string
-                    format: date-time
+                $ref: "#/components/schemas/AuthRegisterResponse"
+
         "422":
           description: Email has already been taken
           content:
@@ -47,49 +37,22 @@ paths:
 
   /oauth/token:
     post:
-      summary: Login (gain credentials)
-      operationId: login
+      summary: Authenticate user
+      tags:
+        - Authentication
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                grant_type:
-                  type: string
-                  example: "password"
-                email:
-                  type: string
-                  example: "thanglearndevops@gmail.com"
-                password:
-                  type: string
-                  example: "thang123"
-                client_id:
-                  type: string
-                  example: "x6CJ4b5BqZddmKIgyUWWL1omIB6f8SNOPI1HGYkIV_o"
-                client_secret:
-                  type: string
-                  example: "XD_ehOAZPc6fJAy4mkovw75BTsw4E3IXN2F5Z6EfzsA"
+              $ref: "#/components/schemas/AuthLoginRequest" 
       responses:
         "200":
           description: Access token and refresh token obtained successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  access_token:
-                    type: string
-                  token_type:
-                    type: string
-                  expires_in:
-                    type: integer
-                  refresh_token:
-                    type: string
-                  created_at:
-                    type: string
-                    format: date-time
+                ref: "#/components/schemas/AuthLoginResponse"
         "400 (wrong password)":
           description: Wrong user's password
           content:
@@ -111,6 +74,8 @@ paths:
                 properties:
                   error:
                     type: string
+                  error:
+                    error_description: string
               example:
                 error: "unsupported_grant_type"
                 error_description: "The authorization grant type is not supported by the authorization server."
@@ -119,25 +84,20 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-              example:
-                error: "invalid_client"
-                error_description: "Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method."
+                $ref: "#/components/schemas/Unauthorized" 
 
   /api/v1/posts:
     get:
       summary: Get a list of posts
-      operationId: getPosts
+      tags:
+        - Posts
       responses:
         "200":
           description: A list of posts
           content:
             application/json:
               schema:
-                type: array
+                type: object
               example:
                 message: "Fetch all posts successfully"
                 metadata:
@@ -164,11 +124,14 @@ paths:
 
     post:
       summary: Create a new post
-      operationId: createPost
+      tags:
+        - Posts
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: "#/components/schemas/NewPost"
       responses:
@@ -177,19 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  metadata:
-                    type: object
-                    properties:
-                      post:
-                        $ref: "#/components/schemas/Post"
-                      images:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/Image"
+                $ref: "#/components/schemas/PostCreated"
               example:
                 message: "Created post successfully"
                 metadata:
@@ -203,8 +154,94 @@ paths:
                   images:
                     - media_url: "http://honey-morning-bucket-storage.s3.ap-southeast-1.amazonaws.com/d87fdaf7175461ff.jpeg"
                       media_type: "image"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                message: "Unauthorized"
+                detail: "The access token is invalid"
+
+  /api/v1/posts/{id}:
+    get:
+      summary: Get a post by ID
+      tags:
+        - Posts
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: A post
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: "Fetch post successfully"
+                metadata:
+                  - post:
+                      id: 1
+                      user_id: 2
+                      title: "Today, it is very good outside 🏖️"
+                      body: "Let's chill with our children"
+                      created_at: "2024-01-27T14:30:40.808Z"
+                      updated_at: "2024-01-27T14:30:40.808Z"
+                    images:
+                      - media_url: "http://honey-morning-bucket-storage.s3.ap-southeast-1.amazonaws.com/333481aa0824c4ef.jpg"
+                        media_type: "image"
+
 components:
   schemas:
+    AuthLoginRequest:
+      type: object
+      properties:
+        grant_type:
+          type: string
+          example: "password"
+        email:
+          type: string
+          example: "thanglearndevops@gmail.com"
+        password:
+          type: string
+          example: "thang123"
+        client_id:
+          type: string
+          example: "x6CJ4b5BqZddmKIgyUWWL1omIB6f8SNOPI1HGYkIV_o"
+        client_secret:
+          type: string
+          example: "XD_ehOAZPc6fJAy4mkovw75BTsw4E3IXN2F5Z6EfzsA"
+
+    AuthLoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          type: integer
+        refresh_token:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Unauthorized:
+      type: object
+      properties:
+        message:
+          type: string
+        detail:
+          type: string
+
     NewUser:
       type: object
       properties:
@@ -214,6 +251,7 @@ components:
           type: string
         password:
           type: string
+
     UserCreated:
       type: object
       properties:
@@ -236,6 +274,22 @@ components:
               type: string
             created_at:
               type: integer
+
+    AuthRegisterResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          type: integer
+        refresh_token:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
     Post:
       type: object
       properties:
@@ -253,19 +307,43 @@ components:
         updated_at:
           type: string
           format: date-time
-    Image:
+
+    PostCreated:
+      type: object
+      properties:
+        message:
+          type: string
+        metadata:
+          type: object
+          properties:
+            post:
+              $ref: "#/components/schemas/Post"
+            images:
+              type: array
+              items:
+                $ref: "#/components/schemas/PostImage"
+
+
+    PostImage:
       type: object
       properties:
         media_url:
           type: string
-        media_url:
+        media_type:
           type: string
+
     NewPost:
       type: object
       properties:
-        title:
+        post[title]:
           type: string
-        body:
+        post[body]:
           type: string
-        media:
+        post[media]:
           type: file
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
