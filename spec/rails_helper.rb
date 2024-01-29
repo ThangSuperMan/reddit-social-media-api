@@ -1,5 +1,6 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
+require 'support/common'
 require 'support/oauth_helpers'
 require 'support/user_helpers'
 ENV['RAILS_ENV'] ||= 'test'
@@ -36,6 +37,7 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include OauthHelpers, type: :request
   config.include UserHelpers, type: :request
+  config.include Common, type: :request
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_paths = [

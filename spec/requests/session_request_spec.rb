@@ -4,9 +4,7 @@ RSpec.describe 'Sessions', type: :request do
   let(:user) { create(:user) }
 
   describe 'POST /oauth/token' do
-    before do
-      oauth_sign_in(user)
-    end
+    before { oauth_sign_in(user) }
 
     context 'valid credentials' do
       it 'returns a successful response' do
@@ -14,7 +12,7 @@ RSpec.describe 'Sessions', type: :request do
         expect(json_body).to include(response_format(latest_access_token))
       end
 
-      it 'returns a new access_token based on refresh_token' do
+      it 'succeeds in creating a new access_token based on refresh_token' do
         oauth_request_new_access_token(latest_access_token.refresh_token)
 
         expect(response).to have_http_status(:success)
@@ -30,10 +28,6 @@ RSpec.describe 'Sessions', type: :request do
     end
 
     private
-
-    def json_body
-      JSON.parse(response.body)
-    end
 
     def latest_access_token
       Doorkeeper::AccessToken.last
