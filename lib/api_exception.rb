@@ -38,8 +38,6 @@ module ApiException
         end
       end
 
-      private
-
       def doorkeeper_unauthorized_render_options(error: nil)
         {
           json: {
